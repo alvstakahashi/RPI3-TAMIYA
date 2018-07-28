@@ -1,3 +1,12 @@
+#include <kernel.h>
+#include "kernel_cfg.h"
+
+#include "../rpi_lib/rpi.h"
+#include <stdio.h>
+#include <stdint.h>
+
+#include "kernel_impl.h"
+#include "target_kernel.h"
 //-------------------------------------------------------------------------
 //  miniUart1 driver  miniUart1.c
 //-------------------------------------------------------------------------
@@ -46,6 +55,7 @@ unsigned int uart_recv ( void )
     while(1)
     {
         if(GET32(AUX_MU_LSR_REG)&0x01) break;
+		dly_tsk(50*(TIC_DENO/TIC_NUME));			// 50ms delay 10ns tick
     }
     return(GET32(AUX_MU_IO_REG)&0xFF);
 }
