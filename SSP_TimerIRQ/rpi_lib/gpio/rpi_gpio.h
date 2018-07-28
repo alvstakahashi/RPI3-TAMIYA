@@ -1,8 +1,14 @@
 #ifndef RPILIB_GPIO_H
 #define RPILIB_GPIO_H
  
-#define HIGH	1
-#define LOW		0
+/*! This means pin HIGH, true, 3.3volts on a pin. */
+#ifndef HIGH
+#define HIGH 0x1
+#endif
+/*! This means pin LOW, false, 0volts on a pin. */
+#ifndef LOW
+#define LOW  0x0
+#endif
 
 // GPIO mode
 #define INPUT	0x01
