@@ -5,6 +5,8 @@
 #include "kernel_unrename.h"
 
 #include "kernel_cfg.h"
+#include "time_event.h"
+
 #include "sample1.h"
 
 /*

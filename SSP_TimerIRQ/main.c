@@ -49,7 +49,8 @@ int setup(void)
 	// タイマー値設定(4sec)
 //	*TIMER_LOAD = 4000000-1;
 //	*TIMER_RELOAD = 4000000-1;
-	// タイマー値設定(1msec)
+	// タイマー値設定(1msec) <--間違い　10nsecだと思う。
+	//							1000で1ms 10 で　10ms
 	*TIMER_LOAD = 10-1;
 	*TIMER_RELOAD = 10-1;
 
@@ -110,3 +111,12 @@ void task3(void)
 	}
 }
 
+void cyclic_handler(intptr_t exinf)
+{
+}
+void alarm_handler(intptr_t exinf)
+{
+}
+void alarm_handler2(intptr_t exinf)
+{
+}

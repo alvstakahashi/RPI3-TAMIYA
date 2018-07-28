@@ -509,11 +509,16 @@ go_tsk(ID tskid)
 
 #endif /* TOPPERS_tsk_dsp */
 
+
+extern void signal_time(void);
+
 void isig_tim()
 {
 	int tskid;
 
 //	i_lock_cpu();
+
+	signal_time();						//周期管理処理呼び出し
 
 	for(tskid = 0 ; tskid < TNUM_TSKID; tskid++)
 	{
