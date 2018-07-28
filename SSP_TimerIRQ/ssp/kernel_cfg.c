@@ -21,6 +21,49 @@ const uint_t  	_kernel_tinib_epriority[TNUM_TSKID] = {INT_PRIORITY(1),INT_PRIORI
 
 
 /*
+ *  Cyclic Handler Functions
+ */
+
+const ID _kernel_tmax_cycid = (TMIN_CYCID + TNUM_CYCID - 1);
+const uint_t _kernel_cycevtid_offset = 0;
+
+const uint_t _kernel_cycinib_cycact = 0;
+const intptr_t _kernel_cycinib_exinf[TNUM_CYCID] = {(intptr_t)(NULL)};
+const CYCHDR _kernel_cycinib_cychdr[TNUM_CYCID] = {(cyclic_handler)};
+const RELTIM _kernel_cycinib_cyctim[TNUM_CYCID] = {(2000)};
+const RELTIM _kernel_cycinib_cycphs[TNUM_CYCID] = {(0)};
+
+uint_t _kernel_cyccb_cycact;
+EVTTIM _kernel_cyccb_evttim[TNUM_CYCID];
+
+
+/*
+ *  Alarm Handler Functions
+ */
+
+const ID _kernel_tmax_almid = (TMIN_ALMID + TNUM_ALMID - 1);
+const uint_t _kernel_almevtid_offset = 1;
+
+const ALMHDR _kernel_alminib_almhdr[TNUM_ALMID] = {(alarm_handler),(alarm_handler2)};
+const intptr_t _kernel_alminib_exinf[TNUM_ALMID] = {(intptr_t)(NULL),(intptr_t)(NULL)};
+
+uint_t _kernel_almcb_almact;
+
+/*
+ *  Time Event Management
+ */
+
+#define TNUM_TMEVT 3
+
+const uint_t _kernel_tnum_tmevt_queue = 3;
+
+QUEUE _kernel_tmevt_queue[TNUM_TMEVT+1];
+EVTTIM _kernel_tmevt_time[TNUM_TMEVT];
+CBACK _kernel_tmevt_callback[TNUM_TMEVT];
+uintptr_t _kernel_tmevt_arg[TNUM_TMEVT];
+
+
+/*
  *  Stack Area for System
  */
 
@@ -71,6 +114,8 @@ _kernel_initialize_object(void)
 	_kernel_initialize_task();			//•K—v
 //	_kernel_initialize_interrupt();		
 //	_kernel_initialize_exception();		
+	_kernel_initialize_cyclic();
+	_kernel_initialize_alarm();
 }
 
 
