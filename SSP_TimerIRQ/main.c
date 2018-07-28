@@ -21,6 +21,17 @@
 volatile int count = 0;
 
 
+int auto_steer;		//自動で戻す
+
+
+extern int 		pulseWidth;
+
+#define SPEED_MAX	145
+#define SPEED_MIN	110
+
+
+
+
 int setup(void)
 {
 	initializeJtagPin();
@@ -73,44 +84,92 @@ int setup(void)
 //
 //	return 0;
 }
-void main(intptr_t arg)
+
+void task1(intptr_t arg)
 {
-	printf("main here\n");
-	act_tsk(TASK3_ID);
-	act_tsk(TASK2_ID);
-	printf("main end\n");
+	uint32_t chi;
+	uint32_t clo;
+
+	unsigned long long int now_time;
+
+	now_time = get_systime();
+
+	chi = *SYST_CHI;
+	clo = *SYST_CLO;
+
+
+	now_time = ((unsigned long long int)chi) << 32;
+	now_time += clo;
+//	printf("system time = %d\n",(int)now_time);
+
+//	printf("task1 RUNNING-----------------------------------------------------\n");
 }
 void task2(intptr_t arg)
 {
-	int toggle= 0;
-	printf("task2 RUNNING-----------------------------------------------------\n");
-	for(;;)
+	char name[100];
+
+	name[0] = 0x00;
+	name[1] = 0x00;
+	while(1)
 	{
-		if ((toggle ^= 1) != 0)
-		{
-			printf("TASK2 LED: ON count= %d\n",count);
-			digitalWrite(LED_ACT_PIN, HIGH);
-		}
-		else
-		{
-			printf("TASK2 LED: OFF count= %d\n",count);
-			digitalWrite(LED_ACT_PIN, LOW);
-		}
-		dly_tsk(100000);
+	      printf("動作するならキーをヒットせよ w or s or 4 5 6\n");
+	      name[0] = uart0_getc();
+	      if (name[0] == 'w')
+	      {
+	    	  servo_main(45);
+	    	  printf("モーター動作開始　GPIO17\n");
+	      }
+	      else if (name[0] == 's')
+	      {
+			  stp_cyc(MAIN_CYC);
+	    	  printf("モーター動作停止　GPIO17\n");
+	    	  digitalWrite(16, HIGH);
+	      }
+	      else if (name[0] == '3')
+	      {
+ 		  	if (pulseWidth > SPEED_MIN)
+		 	{
+ 				pulseWidth--;
+		 	}   	  
+	    	printf("モーター動作速度アップGPIO17\n");
+	      }
+	      else if (name[0] == '1')
+	      {
+			if (pulseWidth < SPEED_MAX)
+			{
+				pulseWidth++;
+			} 
+   	  		printf("モーター動作速度ダウンGPIO17=%d\n",pulseWidth);
+	      }
+	      else if (name[0] == '4')	//左
+	      {
+	    	  printf("ステア左 GPIO18\n");
+       	  	  pwm_main(5,500,0);
+	      }
+	      else if (name[0] == '5')	//中
+	      {
+	    	  pwm_main(60,500,0);
+	    	  printf("ステア真ん中GPIO18\n");
+	      }
+	      else if (name[0] == '6')	//右
+	      {
+	    	  printf("ステア右GPIO18\n");
+	    	  pwm_main(95,500,0);
+	      }
+	      else if (name[0] == '7')	//ちょい左
+	      {
+	    	  printf("ちょい左GPIO18\n");
+	    	  pwm_main(30,300,1);
+	      }
+	      else if (name[0] == '9')	//ちょい右
+	      {
+	    	  printf("ちょい右GPIO18\n");
+	    	  pwm_main(75,300,1);
+	      }
 	}
 }
 
-void task3(void)
-{
-	printf("task3-----------------\n");
-	for(;;)
-	{
-		dly_tsk(50000);
-		count++;
-		printf("task3-----------------\n");
-	}
-}
-
+#ifdef TAMIYA_NO_IMPREMENT
 void cyclic_handler(intptr_t exinf)
 {
 }
@@ -120,3 +179,4 @@ void alarm_handler(intptr_t exinf)
 void alarm_handler2(intptr_t exinf)
 {
 }
+#endif

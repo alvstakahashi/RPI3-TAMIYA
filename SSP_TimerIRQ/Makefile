@@ -9,6 +9,9 @@ READELF= $(CROSS)readelf
 
 STARTUP= startup.o
 OBJS= main.o io.o
+OBJS+=pwm.o
+OBJS+=bcm2835.o
+OBJS+=servo.o
 
 # systemcall
 OBJS += syscalls.o
