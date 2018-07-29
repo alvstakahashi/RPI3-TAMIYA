@@ -113,6 +113,7 @@ RELTIM	tskTout[TNUM_TSKID];
 void
 _kernel_initialize_object(void)
 {
+	_kernel_initialize_time_event();
 	_kernel_initialize_task();			//•K—v
 //	_kernel_initialize_interrupt();		
 //	_kernel_initialize_exception();		

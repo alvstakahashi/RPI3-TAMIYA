@@ -98,6 +98,7 @@ _write (int    file,
     for(r=0;r<len;r++){
       uart0_putc(ptr[r]);
     }
+	uart_flush();
     return len;
 }
 
