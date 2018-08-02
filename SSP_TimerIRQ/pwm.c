@@ -25,14 +25,19 @@
 #undef PWM_BASE
 #undef CLOCK_BASE
 
+#if defined(RPI2) || defined(RPI3)
+#define BCM2708_PERI_BASE       0x3F000000
+#else
 #define BCM2708_PERI_BASE       0x20000000
+#endif
+
 #define GPIO_BASE               (BCM2708_PERI_BASE + 0x200000) /* GPIO controller */
 #define PWM_BASE                (BCM2708_PERI_BASE + 0x20C000) /* PWM controller */
 #define CLOCK_BASE              (BCM2708_PERI_BASE + 0x101000)
 
 #define PWM_CTL  0
-#define PWM_RNG1 4
-#define PWM_DAT1 5
+#define PWM_RNG1 (0x10/(sizeof(int)))				//00010
+#define PWM_DAT1 (0x14/(sizeof(int)))				//00014
 
 #define PWMCLK_CNTL 40
 #define PWMCLK_DIV  41
@@ -119,6 +124,7 @@ int pwm_main(int param_pw,int param_dur,int auto_prm)
 
 void alarm_handler2(intptr_t exinf)
 {
+#if 1
 	int pw;
 	if (auto_steer)
 	{
@@ -129,12 +135,13 @@ void alarm_handler2(intptr_t exinf)
 	       return;
 	}	
     *(clk + PWMCLK_CNTL) = 0x5A000000 | (1 << 5);
-	printf("alarm_handler2 here\n"); 
+//	printf("alarm_handler2 here\n"); 
 
     usleep(10);
     *(pwm + PWM_CTL) = 0;
-    GPIO_SET = 1;
+//    GPIO_SET = 1;
     return ;
+#endif
 }
 
 // map 4k register memory for direct access from user space and return a user space pointer to it
@@ -197,10 +204,19 @@ void setupRegisterMemoryMappings()
 
 void setServo(int percent)
 {
-    unsigned int bits = 0;
+        int bitCount;
+        unsigned int bits = 0;
 
-	bits = 45 + percent/2;
-	printf("set servo bits = %d\n",bits);
+        // 32 bits = 2 milliseconds
+        bitCount = 16 + 16 * percent / 100;
+        if (bitCount > 32) bitCount = 32;
+        if (bitCount < 1) bitCount = 1;
+        bits = 0;
+        while (bitCount) {
+                bits <<= 1;
+                bits |= 1;
+                bitCount--;
+        }
     *(pwm + PWM_DAT1) = bits;
 }
 
@@ -211,14 +227,26 @@ void initHardware()
         setupRegisterMemoryMappings();
 
         // set PWM alternate function for GPIO18
-        SET_GPIO_ALT(18, 5);
+//        SET_GPIO_ALT(18, 5);  停止する
+//	  	*(gpio + 0x4/4) = (*(gpio + 0x4/4) & ~(0x7 << 24 )) | (0b010 << 24);
+		pinMode(18,ALT5);  //停止しなかった
 
+#if 1
         // stop clock and waiting for busy flag doesn't work, so kill clock
         *(clk + PWMCLK_CNTL) = 0x5A000000 | (1 << 5);
         usleep(10);
 
         // set frequency
-        *(clk + PWMCLK_DIV)  = 0x5A000000 | (400 <<12);
+        // DIVI is the integer part of the divisor
+        // the fractional part (DIVF) drops clock cycles to get the output frequency, bad for servo motors
+        // 320 bits for one cycle of 20 milliseconds = 62.5 us per bit = 16 kHz
+        int idiv = (int) (19200000.0f / 16000.0f);
+        if (idiv < 1 || idiv > 0x1000) {
+                printf("idiv out of range: %x\n", idiv);
+             //   exit(-1);
+        }
+        *(clk + PWMCLK_DIV)  = 0x5A000000 | (idiv<<12);
+        //*(clk + PWMCLK_DIV)  = 0x5A000000 | (400 <<12);
 
         // source=osc and enable clock
         *(clk + PWMCLK_CNTL) = 0x5A000011;
@@ -229,7 +257,10 @@ void initHardware()
         // needs some time until the PWM module gets disabled, without the delay the PWM module crashs
         usleep(10);
 
-        *(pwm + PWM_RNG1) = 1024;
+        //*(pwm + PWM_RNG1) = 1024;
+        *(pwm + PWM_RNG1) = 320;
 
-		*(pwm + PWM_CTL) = 0x5A000081;		// MSモードで利用
+//		*(pwm + PWM_CTL) = 0x5A000081;		// MSモードで利用
+		*(pwm + PWM_CTL) = 3;		// start PWM1 in serializer mode 停止しなかった
+#endif
 }

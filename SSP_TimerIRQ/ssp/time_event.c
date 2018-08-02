@@ -144,7 +144,7 @@ signal_time(void)
 {
 	QUEIDX pos = TMEVT_HEAD().next , evtid;
 	
-	i_lock_cpu();
+//	i_lock_cpu();
 	
 	/* 現在時刻の更新 */
 	current_time += (EVTTIM)TIC_NUME;
@@ -161,7 +161,7 @@ signal_time(void)
 	/* min_timeの更新 */
 	min_time = current_time;
 	
-	i_unlock_cpu();
+//	i_unlock_cpu();
 }
 
 #endif /* TOPPERS_sig_tim */

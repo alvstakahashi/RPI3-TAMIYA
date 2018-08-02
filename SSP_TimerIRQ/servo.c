@@ -31,8 +31,9 @@
 extern  volatile uint32_t *bcm2835_gpio;
 int 	pulseWidth;			//リアモーターパルス幅　単位10us
 
-int servo_main(int duty)
+int servo_main(void)
 {
+#if 0
     int pw = 50;
 
     printf("servo main duty = %d \n",duty);
@@ -41,8 +42,10 @@ int servo_main(int duty)
     pw = 1000 + (int)((1000 * pw) / 100);
 
     pulseWidth = pw/10;
-
+    
+    pulseWidth = 135;
     printf("pulse width %d usec, duration forever\n", pw);
+#endif
 
     if (!bcm2835_init())
         return 1;

@@ -26,10 +26,15 @@ int auto_steer;		//自動で戻す
 
 extern int 		pulseWidth;
 
-#define SPEED_MAX	145
+#define SPEED_MAX	140
 #define SPEED_MIN	110
+#define SPEED_DEF	135
 
 
+#define RSPEED_MAX	155
+#define RSPEED_MIN	144
+
+#define RSPEED_DEF	148
 
 
 int setup(void)
@@ -116,8 +121,9 @@ void task2(intptr_t arg)
 	      name[0] = uart0_getc();
 	      if (name[0] == 'w')
 	      {
-	    	  servo_main(45);
-	    	  printf("モーター動作開始　GPIO17\n");
+			  pulseWidth = SPEED_DEF;
+	    	  servo_main();
+	    	  printf("モーター動作開始　GPIO17=%d\n",pulseWidth);
 	      }
 	      else if (name[0] == 's')
 	      {
@@ -125,15 +131,15 @@ void task2(intptr_t arg)
 	    	  printf("モーター動作停止　GPIO17\n");
 	    	  digitalWrite(16, HIGH);
 	      }
-	      else if (name[0] == '3')
+	      else if (name[0] == '1')
 	      {
  		  	if (pulseWidth > SPEED_MIN)
 		 	{
  				pulseWidth--;
 		 	}   	  
-	    	printf("モーター動作速度アップGPIO17\n");
+	    	printf("モーター動作速度アップGPIO17=%d\n",pulseWidth);
 	      }
-	      else if (name[0] == '1')
+	      else if (name[0] == '3')
 	      {
 			if (pulseWidth < SPEED_MAX)
 			{
@@ -141,6 +147,13 @@ void task2(intptr_t arg)
 			} 
    	  		printf("モーター動作速度ダウンGPIO17=%d\n",pulseWidth);
 	      }
+	      else if (name[0] == '2')	//バック
+	      {
+			  pulseWidth = 146;
+	    	  servo_main();
+			  pulseWidth = RSPEED_DEF;
+	    	  printf("モーターバック動作開始　GPIO17=%d\n",pulseWidth);
+		  }
 	      else if (name[0] == '4')	//左
 	      {
 	    	  printf("ステア左 GPIO18\n");

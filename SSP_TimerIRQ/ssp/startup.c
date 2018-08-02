@@ -47,7 +47,11 @@
 #include "t_stddef.h"
 #include "kernel_impl.h"
 
-
+/*
+ *	RAM エリアを確保しておく
+ */
+#define		SIZEOF_NOUSE	0x500
+STK_T       _kernel_No_USE[COUNT_STK_T(SIZEOF_NOUSE)] = { 0 };
 /*
  *  カーネル動作状態フラグ
  *
