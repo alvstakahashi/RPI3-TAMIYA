@@ -24,20 +24,18 @@ volatile int count = 0;
 int auto_steer;		//自動で戻す
 
 
-volatile int 		pulseWidth;
+extern int 		pulseWidth;
 
-//最高速　155
-//最低　　145
-//開始　　146
+#define SPEED_MAX	140
+#define SPEED_MIN	110
+#define SPEED_DEF	135
 
-#define SPEED_MAX	155
-#define SPEED_MIN	144
 
-#define SPEED_DEF	147
+#define RSPEED_MAX	155
+#define RSPEED_MIN	144
 
-#define LEFT		15
-#define	RIGHT		85
-#define CENTER		45
+#define RSPEED_DEF	148
+
 
 int setup(void)
 {
@@ -114,7 +112,6 @@ void task1(intptr_t arg)
 void task2(intptr_t arg)
 {
 	char name[100];
-	int		strCount = 45;
 
 	name[0] = 0x00;
 	name[1] = 0x00;
@@ -124,46 +121,53 @@ void task2(intptr_t arg)
 	      name[0] = uart0_getc();
 	      if (name[0] == 'w')
 	      {
-	    	  servo_main();
 			  pulseWidth = SPEED_DEF;
-	    	  printf("Motor Start GPIO17=%d \n",pulseWidth);
+	    	  servo_main();
+	    	  printf("モーター動作開始　GPIO17=%d\n",pulseWidth);
 	      }
 	      else if (name[0] == 's')
 	      {
 			  stp_cyc(MAIN_CYC);
-	    	  printf("Motor Stop GPIO17\n");
+	    	  printf("モーター動作停止　GPIO17\n");
 	    	  digitalWrite(16, HIGH);
 	      }
 	      else if (name[0] == '1')
 	      {
- 		  	if (pulseWidth < SPEED_MAX)
+ 		  	if (pulseWidth > SPEED_MIN)
 		 	{
- 				pulseWidth++;
+ 				pulseWidth--;
 		 	}   	  
-	    	printf("Up 17=%d \n",pulseWidth);
+	    	printf("モーター動作速度アップGPIO17=%d\n",pulseWidth);
 	      }
 	      else if (name[0] == '3')
 	      {
-			if (pulseWidth > SPEED_MIN)
+			if (pulseWidth < SPEED_MAX)
 			{
-				pulseWidth--;
+				pulseWidth++;
 			} 
-   	  		printf("Down 17=%d \n",pulseWidth);
+   	  		printf("モーター動作速度ダウンGPIO17=%d\n",pulseWidth);
 	      }
+	      else if (name[0] == '2')	//バック
+	      {
+			  pulseWidth = 146;
+	    	  servo_main();
+			  pulseWidth = RSPEED_DEF;
+	    	  printf("モーターバック動作開始　GPIO17=%d\n",pulseWidth);
+		  }
 	      else if (name[0] == '4')	//左
 	      {
-	    	  printf("ステア左 GPIO18%d\n",strCount);
-       	  	  pwm_main(LEFT,500,0);
+	    	  printf("ステア左 GPIO18\n");
+       	  	  pwm_main(5,500,0);
 	      }
 	      else if (name[0] == '5')	//中
 	      {
-	    	  pwm_main(CENTER,500,0);
-	    	  printf("ステア真ん中GPIO18%d\n",strCount);
+	    	  pwm_main(60,500,0);
+	    	  printf("ステア真ん中GPIO18\n");
 	      }
 	      else if (name[0] == '6')	//右
 	      {
-	    	  printf("ステア右GPIO188%d\n",strCount);
-	    	  pwm_main(RIGHT,500,0);
+	    	  printf("ステア右GPIO18\n");
+	    	  pwm_main(95,500,0);
 	      }
 	      else if (name[0] == '7')	//ちょい左
 	      {
