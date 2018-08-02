@@ -8,13 +8,16 @@ SIZE= $(CROSS)size
 READELF= $(CROSS)readelf
 
 STARTUP= startup.o
-OBJS= main.o io.o
+
+#ssp liblary
+OBJS  = ssp/kernel_cfg.o ssp/startup.o ssp/task.o ssp/task_manage.o
+OBJS += arch/RPI/vector.o 
+OBJS+= ssp/alarm.o ssp/cyclic.o ssp/time_event.o
+
+OBJS+= main.o io.o
 OBJS+=pwm.o
 OBJS+=bcm2835.o
 OBJS+=servo.o
-
-# systemcall
-OBJS += syscalls.o
 
 # RaspberryPi library
 OBJS+= rpi_lib/rpi_init.o rpi_lib/gpio/gpio.o rpi_lib/timer/timer.o rpi_lib/delay/delay.o
@@ -22,10 +25,9 @@ OBJS+= rpi_lib/serial/serial.o
 OBJS+= rpi_lib/serial/miniUart1.o
 OBJS+= rpi_lib/bss/clearbss.o
 
-#ssp liblary
-OBJS+= ssp/kernel_cfg.o ssp/startup.o ssp/task.o ssp/task_manage.o
-OBJS += arch/RPI/vector.o 
-OBJS+= ssp/alarm.o ssp/cyclic.o ssp/time_event.o
+# systemcall
+OBJS += syscalls.o
+
 
 #ssp include
 INCSSP = -I./ssp -I./include -I./arch/RPI -I./rpi_lib -I./rpi_lib/peripherals

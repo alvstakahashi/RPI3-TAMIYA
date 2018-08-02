@@ -70,7 +70,7 @@ uintptr_t _kernel_tmevt_arg[TNUM_TMEVT];
  */
 
 #define TOPPERS_ISTKSZ		DEFAULT_ISTKSZ
-static STK_T          		_kernel_stack[COUNT_STK_T(TOPPERS_ISTKSZ)];
+STK_T          		_kernel_stack[COUNT_STK_T(TOPPERS_ISTKSZ)];
 #define TOPPERS_STK   		_kernel_stack
 #define TOPPERS_STKSZ		ROUND_STK_T(TOPPERS_ISTKSZ)
 

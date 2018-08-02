@@ -111,9 +111,6 @@ int Serial_write(char *buf,int len){
 		i++;
 		buf++;
 	}
-#ifdef RPI3
-	uart_flush();
-#endif
 	return i;
 }
 

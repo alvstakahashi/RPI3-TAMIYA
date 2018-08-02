@@ -29,10 +29,11 @@
 #define PIN RPI_GPIO_P1_11
 
 extern  volatile uint32_t *bcm2835_gpio;
-int 	pulseWidth;			//リアモーターパルス幅　単位10us
+extern  volatile int 	pulseWidth;			//リアモーターパルス幅　単位10us
 
-int servo_main(int duty)
+int servo_main(void)
 {
+#if 0
     int pw = 50;
 
     printf("servo main duty = %d \n",duty);
@@ -44,6 +45,7 @@ int servo_main(int duty)
 
     printf("pulse width %d usec, duration forever\n", pw);
 
+#endif
     if (!bcm2835_init())
         return 1;
 
@@ -58,7 +60,7 @@ void cyclic_handler(intptr_t exinf)
 {
 	bcm2835_gpio_write(PIN, HIGH);
 	ista_alm(MAIN_ALM,pulseWidth);
-	digitalWrite(16, LOW);
+	//digitalWrite(16, LOW);
 	iact_tsk(TASK1_ID);
 }
 void alarm_handler(intptr_t exinf)
