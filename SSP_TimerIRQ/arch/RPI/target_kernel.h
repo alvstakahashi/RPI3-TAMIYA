@@ -76,8 +76,7 @@
  *  タイムティックの定義
  */
 #define	TIC_NUME		( 1U )		/* タイムティックの周期の分子 */
-#define	TIC_DENO		( 100U )	/* タイムティックの周期の分母 */
-									/* RCコントロール用　1/100ms == 10ns	*/
+#define	TIC_DENO		( 1U )		/* タイムティックの周期の分母 */
 
 
 #define	set_task_stack(x)	__asm__( "mov sp,%[Rs1]"::[Rs1]"r"(x))
